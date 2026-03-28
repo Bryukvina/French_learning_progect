@@ -1,0 +1,95 @@
+{% extends "base_page.html" %}
+
+{% block page-title %}
+French simulator and training cards for better learning
+{% endblock %}
+
+{% block page-lead %}
+Welcome to the french learning with fun <br/>
+Here you can learn your favorite words by the categories
+{% endblock %}
+
+{% block content %}
+<div class="container px-4 py-5" id="project-contents">
+    <h2 class="pb-2 border-bottom">Let's start learningе</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-4">
+        <div class="col d-flex">
+            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <svg class="bi" width="1em" height="1em">
+                    <use xlink:href="#cpu-fill"></use>
+                </svg>
+            </div>
+            <div>
+                <h3 class="fs-2">Vocabulary</h3>
+                <p>Here you can find the list of the words with translation and sentenses</p>
+                <a href="/term-list" class="btn btn-primary">Take a look</a>
+            </div>
+        </div>
+        <div class="col d-flex">
+            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <svg class="bi" width="1em" height="1em">
+                    <use xlink:href="#cpu-fill"></use>
+                </svg>
+            </div>
+            <div>
+                <h3 class="fs-2">Add your own words</h3>
+                <p>Add new words and learn it easy</p>
+                <a href="/add-term" class="btn btn-primary">
+                    Add a new word
+                </a>
+            </div>
+        </div>
+        <div class="col d-flex">
+            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <svg class="bi" width="1em" height="1em">
+                    <use xlink:href="#cpu-fill"></use>
+                </svg>
+            </div>
+            <div>
+                <h3 class="fs-2">Learn new words</h3>
+                <p>Can you remember all this word? <br>
+                Let's check</p>
+                <a href="/learn-words" class="btn btn-primary">
+                    Learn
+                </a>
+            </div>
+        </div>
+        <div class="col d-flex">
+            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                <svg class="bi" width="1em" height="1em">
+                    <use xlink:href="#cpu-fill"></use>
+                </svg>
+            </div>
+            <div>
+                <h3 class="fs-2">Play and check your knowledges</h3>
+                <p> WIth our game learnong french became easier) </p>
+                <a href="/check-term" class="btn btn-primary">
+                    Play
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    
+    <h2 class="pb-2 border-bottom">Что можете сделать вы?</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-2">
+        <div class="col-lg-4">
+            <h4 class="py-1">Useful resources</h4>
+        </div>
+        <div class="col-lg-8">
+            <p>Этот проект использует <a href="https://getbootstrap.com">Bootstrap</a>. Попробуйте другие дизайн-системы, например:
+                <ul>
+                    <li><a href="https://materializecss.com">Materialize</a></li>
+                    <li><a href="https://semantic-ui.com">Semantic UI</a></li>
+                    <li><a href="https://get.foundation/templates.html">Foundation</a></li>
+                </ul>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
