@@ -1,9 +1,823 @@
-{% extends "base_page.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French-English Learning Game</title>
+    <style>
+        /* Additional specific styles for the game */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block page-title %}
-Игра- проверка терминов
-{% endblock %}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #d4b48c 0%, #8b5a2b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-{% block page-lead %}
-игра с введением перевода в обе стороны
-{% endblock %}
+        .game-container {
+            max-width: 1200px;
+            width: 100%;
+            background: #faf0e1;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, #c4a27a 0%, #6b3e1c 100%);
+            color: #fff8ed;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .game-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .game-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .mode-selector {
+            background: #e8dccc;
+            padding: 20px;
+            border-bottom: 2px solid #c9b28b;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: #fff8ed;
+            border: 2px solid #9b6e42;
+            color: #6b3e1c;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            background: #f5e6d3;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #c4a27a 0%, #8b5a2b 100%);
+            color: white;
+            border-color: white;
+        }
+
+        .game-content {
+            padding: 40px;
+        }
+
+        /* Loading spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #8b5a2b;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Styles for matching mode */
+        .columns-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .column h2 {
+            text-align: center;
+            color: #8b5a2b;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #c4a27a;
+        }
+
+        .french-column h2 {
+            color: #6b3e1c;
+            border-bottom-color: #c4a27a;
+        }
+
+        .english-column h2 {
+            color: #8b5a2b;
+            border-bottom-color: #c4a27a;
+        }
+
+        .words-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .word-card {
+            background: #fff8ed;
+            border: 3px solid #d4b48c;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .french-card {
+            background: linear-gradient(135deg, #fff5e6 0%, #f5e6d3 100%);
+            color: #6b3e1c;
+            border-color: #c4a27a;
+        }
+
+        .english-card {
+            background: linear-gradient(135deg, #fff5e6 0%, #f5e6d3 100%);
+            color: #8b5a2b;
+            border-color: #c4a27a;
+        }
+
+        .word-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .word-card.selected {
+            background: linear-gradient(135deg, #ecd9b4 0%, #d4b48c 100%);
+            border-color: #9b6e42;
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .word-card.matched {
+            background: linear-gradient(135deg, #b8c9a1 0%, #8ba86e 100%);
+            border-color: #6b8c42;
+            color: white;
+            cursor: default;
+            text-decoration: line-through;
+            pointer-events: none;
+            transform: none;
+        }
+
+        .word-card.incorrect {
+            background: linear-gradient(135deg, #d9a37a 0%, #b86f3c 100%);
+            border-color: #9b4a2a;
+            color: white;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Styles for quiz mode */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .current-word {
+            background: linear-gradient(135deg, #fff5e6 0%, #f5e6d3 100%);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 3px solid #c4a27a;
+        }
+
+        .current-word h3 {
+            color: #6b3e1c;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .current-word .french-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #8b5a2b;
+            margin: 20px 0;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .input-area input {
+            flex: 1;
+            max-width: 400px;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #d4b48c;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fff8ed;
+        }
+
+        .input-area input:focus {
+            border-color: #c4a27a;
+            box-shadow: 0 0 0 3px rgba(196, 162, 122, 0.1);
+        }
+
+        .input-area button {
+            background: linear-gradient(135deg, #c4a27a 0%, #8b5a2b 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #d4b48c 0%, #9b6e42 100%);
+        }
+
+        .quiz-progress {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #8b5a2b;
+            font-weight: 600;
+        }
+
+        .quiz-feedback {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .quiz-feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .quiz-feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .score-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e8dccc;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #8b5a2b;
+            margin-bottom: 20px;
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, #c4a27a 0%, #8b5a2b 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #d4b48c 0%, #9b6e42 100%);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 768px) {
+            .game-content {
+                padding: 20px;
+            }
+            
+            .columns-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .word-card {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            
+            .game-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .column h2 {
+                font-size: 1.4rem;
+            }
+            
+            .current-word .french-word {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🇫🇷 Learn French 🇬🇧</h1>
+            <p>Choose your game mode and practice your knowledge!</p>
+        </div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="match">🔗 Match Words</button>
+            <button class="mode-btn" data-mode="type">✍️ Type Translation</button>
+        </div>
+        
+        <div class="game-content">
+            <div id="loadingIndicator" class="loading">Loading words from database</div>
+            
+            <!-- Matching Mode -->
+            <div id="matchMode" style="display: none;">
+                <div class="columns-container">
+                    <div class="column french-column">
+                        <h2>Français 🇫🇷</h2>
+                        <div class="words-list" id="frenchWords"></div>
+                    </div>
+                    
+                    <div class="column english-column">
+                        <h2>English 🇬🇧</h2>
+                        <div class="words-list" id="englishWords"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quiz Mode -->
+            <div id="quizMode" style="display: none;">
+                <div class="quiz-container">
+                    <div class="current-word">
+                        <h3>Translate the word to English:</h3>
+                        <div class="french-word" id="currentFrenchWord"></div>
+                    </div>
+                    <div class="input-area">
+                        <input type="text" id="userAnswer" placeholder="Enter English translation..." autocomplete="off">
+                        <button id="checkAnswerBtn">Check ✅</button>
+                    </div>
+                    <div class="quiz-progress" id="quizProgress"></div>
+                    <div id="quizFeedback" class="quiz-feedback"></div>
+                </div>
+            </div>
+            
+            <div class="score-section">
+                <div class="score" id="score">Correct pairs: 0 / 0</div>
+                <button class="reset-button" id="resetBtn">🔄 New Game</button>
+                <div id="message" class="message" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let words = [];
+        let frenchWordsList = [];
+        let englishWordsList = [];
+        let selectedFrenchIndex = null;
+        let matchedPairs = 0;
+        let quizWords = [];
+        let currentQuizIndex = 0;
+        let correctAnswers = 0;
+        let currentMode = 'match';
+
+        // Load words from server
+        async function loadWordsFromServer() {
+            try {
+                const response = await fetch('/api/game-words');
+                const data = await response.json();
+                words = data.words;
+                
+                if (words.length === 0) {
+                    showMessage('No words found in database. Please add some terms first!', 'error');
+                    return false;
+                }
+                
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('matchMode').style.display = 'block';
+                
+                initMatchMode();
+                return true;
+            } catch (error) {
+                console.error('Error loading words:', error);
+                document.getElementById('loadingIndicator').innerHTML = 'Failed to load words. Please check database connection.';
+                showMessage('Failed to load words from database!', 'error');
+                return false;
+            }
+        }
+
+        // Function to shuffle an array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Initialize match mode
+        function initMatchMode() {
+            frenchWordsList = words.map((item, index) => ({
+                text: item.french,
+                originalIndex: index,
+                matched: false
+            }));
+            
+            englishWordsList = words.map((item, index) => ({
+                text: item.english,
+                originalIndex: index,
+                matched: false
+            }));
+            
+            englishWordsList = shuffleArray(englishWordsList);
+            
+            selectedFrenchIndex = null;
+            matchedPairs = 0;
+            
+            renderMatchMode();
+            updateScore();
+            hideMessage();
+        }
+
+        // Render match mode
+        function renderMatchMode() {
+            const frenchContainer = document.getElementById('frenchWords');
+            const englishContainer = document.getElementById('englishWords');
+            
+            frenchContainer.innerHTML = frenchWordsList.map((word, index) => `
+                <div class="word-card french-card ${word.matched ? 'matched' : ''} ${selectedFrenchIndex === index ? 'selected' : ''}" 
+                     data-french-index="${index}">
+                    ${escapeHtml(word.text)}
+                </div>
+            `).join('');
+            
+            englishContainer.innerHTML = englishWordsList.map((word, index) => `
+                <div class="word-card english-card ${word.matched ? 'matched' : ''}" 
+                     data-english-index="${index}">
+                    ${escapeHtml(word.text)}
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('[data-french-index]').forEach(card => {
+                if (!frenchWordsList[card.dataset.frenchIndex].matched) {
+                    card.addEventListener('click', () => selectFrenchWord(parseInt(card.dataset.frenchIndex)));
+                }
+            });
+            
+            document.querySelectorAll('[data-english-index]').forEach(card => {
+                if (!englishWordsList[card.dataset.englishIndex].matched) {
+                    card.addEventListener('click', () => selectEnglishWord(parseInt(card.dataset.englishIndex)));
+                }
+            });
+        }
+
+        // Select French word in match mode
+        function selectFrenchWord(index) {
+            if (frenchWordsList[index].matched) return;
+            
+            if (selectedFrenchIndex === index) {
+                selectedFrenchIndex = null;
+                renderMatchMode();
+                return;
+            }
+            
+            selectedFrenchIndex = index;
+            renderMatchMode();
+        }
+
+        // Select English word in match mode
+        function selectEnglishWord(englishIndex) {
+            if (selectedFrenchIndex === null) {
+                showMessage('Please select a French word first!', 'info');
+                return;
+            }
+            
+            if (englishWordsList[englishIndex].matched) {
+                showMessage('This word is already matched!', 'error');
+                selectedFrenchIndex = null;
+                renderMatchMode();
+                return;
+            }
+            
+            const frenchWord = frenchWordsList[selectedFrenchIndex];
+            const englishWord = englishWordsList[englishIndex];
+            
+            if (frenchWord.originalIndex === englishWord.originalIndex) {
+                frenchWord.matched = true;
+                englishWord.matched = true;
+                matchedPairs++;
+                
+                showMessage('✅ Correct! Great job!', 'success');
+                updateScore();
+                
+                selectedFrenchIndex = null;
+                renderMatchMode();
+                
+                if (matchedPairs === words.length) {
+                    setTimeout(() => {
+                        showMessage('🎉 Congratulations! You matched all words correctly! 🎉', 'success');
+                    }, 100);
+                }
+            } else {
+                showMessage('❌ Incorrect! Try again!', 'error');
+                
+                const englishCard = document.querySelector(`[data-english-index="${englishIndex}"]`);
+                const frenchCard = document.querySelector(`[data-french-index="${selectedFrenchIndex}"]`);
+                if (englishCard && frenchCard) {
+                    englishCard.classList.add('incorrect');
+                    frenchCard.classList.add('incorrect');
+                    
+                    setTimeout(() => {
+                        englishCard.classList.remove('incorrect');
+                        frenchCard.classList.remove('incorrect');
+                    }, 500);
+                }
+                
+                selectedFrenchIndex = null;
+                renderMatchMode();
+            }
+        }
+
+        // Initialize quiz mode
+        function initQuizMode() {
+            quizWords = shuffleArray([...words]);
+            currentQuizIndex = 0;
+            correctAnswers = 0;
+            updateQuizProgress();
+            displayCurrentWord();
+            updateScore();
+            hideMessage();
+            document.getElementById('userAnswer').value = '';
+            document.getElementById('quizFeedback').className = 'quiz-feedback';
+            document.getElementById('quizFeedback').textContent = '';
+            document.getElementById('userAnswer').disabled = false;
+            document.getElementById('checkAnswerBtn').disabled = false;
+        }
+
+        // Display current word in quiz mode
+        function displayCurrentWord() {
+            if (currentQuizIndex < quizWords.length) {
+                document.getElementById('currentFrenchWord').textContent = escapeHtml(quizWords[currentQuizIndex].french);
+                document.getElementById('userAnswer').focus();
+            }
+        }
+
+        // Check answer in quiz mode
+        function checkAnswer() {
+            const userAnswer = document.getElementById('userAnswer').value.trim();
+            const feedbackDiv = document.getElementById('quizFeedback');
+            
+            if (!userAnswer) {
+                feedbackDiv.textContent = 'Please enter a translation!';
+                feedbackDiv.className = 'quiz-feedback incorrect';
+                return;
+            }
+            
+            const currentWord = quizWords[currentQuizIndex];
+            const isCorrect = userAnswer.toLowerCase() === currentWord.english.toLowerCase();
+            
+            if (isCorrect) {
+                feedbackDiv.textContent = '✅ Correct! Great job!';
+                feedbackDiv.className = 'quiz-feedback correct';
+                correctAnswers++;
+                updateScore();
+                
+                setTimeout(() => {
+                    currentQuizIndex++;
+                    updateQuizProgress();
+                    
+                    if (currentQuizIndex < quizWords.length) {
+                        displayCurrentWord();
+                        document.getElementById('userAnswer').value = '';
+                        feedbackDiv.className = 'quiz-feedback';
+                        feedbackDiv.textContent = '';
+                    } else {
+                        feedbackDiv.textContent = `🎉 Congratulations! You answered all ${words.length} questions correctly! 🎉`;
+                        feedbackDiv.className = 'quiz-feedback correct';
+                        document.getElementById('userAnswer').disabled = true;
+                        document.getElementById('checkAnswerBtn').disabled = true;
+                        showMessage('Game completed! Click "New Game" to continue', 'success');
+                    }
+                }, 1000);
+            } else {
+                feedbackDiv.textContent = `❌ Incorrect! The correct answer is: ${escapeHtml(currentWord.english)}`;
+                feedbackDiv.className = 'quiz-feedback incorrect';
+                
+                const inputElement = document.getElementById('userAnswer');
+                inputElement.classList.add('incorrect');
+                setTimeout(() => {
+                    inputElement.classList.remove('incorrect');
+                }, 500);
+                
+                document.getElementById('userAnswer').value = '';
+                setTimeout(() => {
+                    feedbackDiv.className = 'quiz-feedback';
+                    feedbackDiv.textContent = '';
+                }, 2000);
+            }
+        }
+
+        // Update quiz progress
+        function updateQuizProgress() {
+            const progress = document.getElementById('quizProgress');
+            if (quizWords.length > 0) {
+                progress.textContent = `Question ${currentQuizIndex + 1} of ${quizWords.length}`;
+            }
+        }
+
+        // Update score
+        function updateScore() {
+            const scoreElement = document.getElementById('score');
+            if (currentMode === 'match') {
+                scoreElement.textContent = `Correct pairs: ${matchedPairs} / ${words.length}`;
+            } else {
+                scoreElement.textContent = `Correct answers: ${correctAnswers} / ${words.length}`;
+            }
+            
+            if ((currentMode === 'match' && matchedPairs === words.length) || 
+                (currentMode === 'quiz' && correctAnswers === words.length)) {
+                scoreElement.style.color = '#6b8c42';
+                scoreElement.style.fontSize = '1.8rem';
+            } else {
+                scoreElement.style.color = '#8b5a2b';
+                scoreElement.style.fontSize = '1.5rem';
+            }
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 2000);
+        }
+
+        // Hide message
+        function hideMessage() {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'none';
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Reset game
+        function resetGame() {
+            if (currentMode === 'match') {
+                initMatchMode();
+                showMessage('Game restarted! Match the words!', 'info');
+            } else {
+                initQuizMode();
+                showMessage('Game restarted! Enter your translations!', 'info');
+            }
+        }
+
+        // Switch game mode
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            const matchModeDiv = document.getElementById('matchMode');
+            const quizModeDiv = document.getElementById('quizMode');
+            
+            if (mode === 'match') {
+                matchModeDiv.style.display = 'block';
+                quizModeDiv.style.display = 'none';
+                initMatchMode();
+            } else {
+                matchModeDiv.style.display = 'none';
+                quizModeDiv.style.display = 'block';
+                initQuizMode();
+            }
+            
+            // Update active button
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Event handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWordsFromServer();
+            
+            document.getElementById('resetBtn').addEventListener('click', resetGame);
+            document.getElementById('checkAnswerBtn').addEventListener('click', checkAnswer);
+            document.getElementById('userAnswer').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchMode(btn.dataset.mode);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
