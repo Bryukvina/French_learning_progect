@@ -1,95 +1,815 @@
-{% extends "base_page.html" %}
-
-{% block page-title %}
-French simulator and training cards for better learning
-{% endblock %}
-
-{% block page-lead %}
-Welcome to the french learning with fun <br/>
-Here you can learn your favorite words by the categories
-{% endblock %}
-
-{% block content %}
-<div class="container px-4 py-5" id="project-contents">
-    <h2 class="pb-2 border-bottom">Let's start learningе</h2>
-    <div class="row g-4 py-5 row-cols-1 row-cols-lg-4">
-        <div class="col d-flex">
-            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                <svg class="bi" width="1em" height="1em">
-                    <use xlink:href="#cpu-fill"></use>
-                </svg>
-            </div>
-            <div>
-                <h3 class="fs-2">Vocabulary</h3>
-                <p>Here you can find the list of the words with translation and sentenses</p>
-                <a href="/term-list" class="btn btn-primary">Take a look</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>French learning simulator</title>
+    <!-- load static -->
+    {% load static %}
+    <!-- CSS -->
+    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Дополнительные стили для фона -->
+    <style>
+        /* Основной фон страницы - бежевый */
+        body {
+            background-color: #f5f0e6;
+        }
+        
+        main {
+            background-color: #f5f0e6;
+        }
+        
+        /* Верхняя часть страницы в цвете булгари */
+        .top-burgundy-bar {
+            background-color: #800020;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .top-burgundy-bar .container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        
+        .top-burgundy-bar a {
+            color: #F3E5AB;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: color 0.3s ease;
+        }
+        
+        .top-burgundy-bar a:hover {
+            color: #ffc107;
+            text-decoration: underline;
+        }
+        
+        /* Нижняя часть страницы в цвете булгари */
+        .bottom-burgundy-bar {
+            background-color: #800020;
+            padding: 10px 0;
+            margin-top: 20px;
+            border-radius: 15px 15px 0px 0px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bottom-burgundy-bar .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .bottom-burgundy-bar p {
+            color: #F3E5AB;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .bottom-burgundy-bar a {
+            color: #F3E5AB;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: color 0.3s ease;
+        }
+        
+        .bottom-burgundy-bar a:hover {
+            color: #ffc107;
+            text-decoration: underline;
+        }
+        
+        #title-box {
+            background-image: url('https://www.architime.ru/specarch/gustave_eiffel/3.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            color: #F3E5AB;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        /* Затемнение фона для лучшей читаемости текста */
+        #title-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+        
+        #title-box .container-fluid {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Адаптация текста для лучшей читаемости */
+        #title-box h1,
+        #title-box p {
+            color: #F3E5AB;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+        
+        #title-box p {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        /* Стили для кнопок - цвет булгари (бордовый/винный) */
+        .btn-primary {
+            background-color: #800020;
+            border-color: #600018;
+            color: #F3E5AB;
+        }
+        
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: #5a0017;
+            border-color: #3d0010;
+            color: #F3E5AB;
+        }
+        
+        .btn-secondary {
+            background-color: #6b3e2c;
+            border-color: #5a3424;
+            color: #F3E5AB;
+        }
+        
+        .btn-secondary:hover,
+        .btn-secondary:focus {
+            background-color: #543524;
+            border-color: #3e271b;
+            color: #F3E5AB;
+        }
+        
+        .btn-success {
+            background-color: #800020;
+            border-color: #600018;
+            color: #F3E5AB;
+        }
+        
+        .btn-success:hover,
+        .btn-success:focus {
+            background-color: #5a0017;
+            border-color: #3d0010;
+            color: #F3E5AB;
+        }
+        
+        .btn-danger {
+            background-color: #9b2c1d;
+            border-color: #7a2317;
+            color: #F3E5AB;
+        }
+        
+        .btn-danger:hover,
+        .btn-danger:focus {
+            background-color: #7a2317;
+            border-color: #5e1b11;
+            color: #F3E5AB;
+        }
+        
+        .btn-warning {
+            background-color: #b85c1a;
+            border-color: #9a4b16;
+            color: #F3E5AB;
+        }
+        
+        .btn-warning:hover,
+        .btn-warning:focus {
+            background-color: #9a4b16;
+            border-color: #7a3b12;
+            color: #F3E5AB;
+        }
+        
+        .btn-info {
+            background-color: #6f4f37;
+            border-color: #5a3f2c;
+            color: #F3E5AB;
+        }
+        
+        .btn-info:hover,
+        .btn-info:focus {
+            background-color: #5a3f2c;
+            border-color: #462f21;
+            color: #F3E5AB;
+        }
+        
+        .btn-outline-primary {
+            color: #800020;
+            border-color: #800020;
+        }
+        
+        .btn-outline-primary:hover,
+        .btn-outline-primary:focus {
+            background-color: #800020;
+            border-color: #800020;
+            color: #F3E5AB;
+        }
+        
+        /* Стили для ссылок - цвет #2f0000 на светлом фоне */
+        a:not(.btn) {
+            color: #2f0000;
+            text-decoration: none;
+        }
+        
+        a:not(.btn):hover {
+            color: #800020;
+            text-decoration: underline;
+        }
+        
+        /* Стили для выравнивания элементов в content блоке */
+        .content-section {
+            margin-bottom: 30px;
+        }
+        
+        /* Стиль для строк с элементами - названия и кнопки на одном уровне */
+        .aligned-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fffaf5;
+            border-radius: 10px;
+            border: 1px solid #e6d5b8;
+            transition: all 0.3s ease;
+        }
+        
+        .aligned-row:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Левая часть с названием */
+        .item-title {
+            flex: 1;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2f0000;
+            margin: 0;
+            padding-right: 20px;
+        }
+        
+        /* Правая часть с кнопками */
+        .item-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Для заголовков списков */
+        .list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e6d5b8;
+        }
+        
+        .list-header h2 {
+            margin: 0;
+            color: #2f0000;
+            font-size: 1.5rem;
+        }
+        
+        /* Стили для таблиц, если используется табличное представление */
+        .table-aligned {
+            width: 100%;
+            background-color: #fffaf5;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table-aligned th {
+            background-color: #e6d5b8;
+            color: #2f0000;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .table-aligned td {
+            padding: 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #e6d5b8;
+            color: #2f0000;
+        }
+        
+        .table-aligned tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-aligned .actions-cell {
+            white-space: nowrap;
+            width: 1%;
+        }
+        
+        /* Стили для карточек с сеткой */
+        .items-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        /* Стили для кнопок в content */
+        .btn-sm {
+            padding: 5px 15px;
+            font-size: 0.875rem;
+        }
+        
+        /* Стили для выравнивания карточек */
+        .card-aligned {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .card-aligned .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-aligned .card-text {
+            flex: 1;
+        }
+        
+        .card-aligned .btn-container {
+            margin-top: auto;
+        }
+        
+        /* Стили для блока Useful resources с фоном булгари */
+        .resources-section {
+            background-color: #800020;
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin: 40px 0 30px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .resources-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .resources-section h2 {
+            color: #F3E5AB;
+            border-bottom-color: #F3E5AB !important;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .resources-section h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: #F3E5AB;
+            margin-top: 10px;
+            border-radius: 2px;
+        }
+        
+        .resources-section p {
+            color: #F3E5AB;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .resources-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 20px;
+        }
+        
+        .resources-list li {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .resources-list li:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .resources-list li a {
+            color: #F3E5AB;
+            text-decoration: none;
+            font-size: 1.05rem;
+            font-weight: 500;
+            display: block;
+            transition: color 0.3s ease;
+        }
+        
+        .resources-list li a:hover {
+            color: #ffc107;
+            text-decoration: underline;
+        }
+        
+        /* Стили для раздела "How it works" */
+        .how-it-works-section {
+            background-color: #fffaf5;
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin: 30px 0 40px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e6d5b8;
+        }
+        
+        .how-it-works-section h2 {
+            color: #2f0000;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .how-it-works-section h2::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background-color: #800020;
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+        
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .step-card {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f5f0e6;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: #800020;
+            color: #F3E5AB;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        .step-card h3 {
+            color: #2f0000;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .step-card p {
+            color: #2f0000;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        /* Иконка для ресурсов */
+        .resources-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Стили для картинок в цвете булгари */
+        .icon-square {
+            background-color: #800020 !important;
+            border-radius: 10px;
+            padding: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .icon-square:hover {
+            transform: scale(1.05);
+        }
+        
+        .icon-square svg {
+            fill: #F3E5AB;
+        }
+        
+        /* Стили для нижней подчеркнутой части (секция Let's start learning) */
+        .border-bottom.burgundy {
+            border-bottom: 3px solid #800020 !important;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* Стили для текста на светлом фоне - цвет #2f0000 */
+        h2, h3, h4, p, li, .card-title, .card-text {
+            color: #2f0000;
+        }
+        
+        /* Стили для ссылок в основном контенте */
+        .resources-list li a {
+            color: #F3E5AB;
+        }
+        
+        .resources-list li a:hover {
+            color: #ffc107;
+        }
+        
+        /* Дополнительные стили для карточек */
+        .card {
+            background-color: #fffaf5;
+            border-color: #e6d5b8;
+            height: 100%;
+        }
+        
+        .card-header {
+            background-color: #e6d5b8;
+            border-bottom-color: #d4c2a0;
+            color: #2f0000;
+        }
+        
+        .list-group-item {
+            background-color: #fffaf5;
+            border-color: #e6d5b8;
+            color: #2f0000;
+        }
+        
+        .modal-content {
+            background-color: #fffaf5;
+        }
+        
+        .dropdown-menu {
+            background-color: #fffaf5;
+            border-color: #e6d5b8;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #e6d5b8;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #2f0000;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: #fffaf5;
+            border-color: #e6d5b8 #e6d5b8 #fffaf5;
+            color: #800020;
+        }
+        
+        .pagination .page-link {
+            color: #2f0000;
+            background-color: #fffaf5;
+            border-color: #e6d5b8;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: #800020;
+            border-color: #800020;
+            color: #F3E5AB;
+        }
+        
+        .form-control,
+        .form-select {
+            background-color: #fffaf5;
+            border-color: #e6d5b8;
+            color: #2f0000;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #800020;
+            box-shadow: 0 0 0 0.2rem rgba(128, 0, 32, 0.25);
+        }
+        
+        /* Стили для текста в заголовке */
+        header .fs-2 span {
+            color: #2f0000 !important;
+        }
+        
+        /* Медиазапрос для мобильных устройств */
+        @media (max-width: 768px) {
+            .aligned-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .item-title {
+                padding-right: 0;
+                width: 100%;
+            }
+            
+            .item-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .resources-section {
+                padding: 30px 20px;
+            }
+            
+            .steps-container {
+                flex-direction: column;
+            }
+            
+            .step-card {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <!-- Верхняя часть страницы в цвете булгари -->
+    <div class="top-burgundy-bar">
+        <div class="container">
+        </div>
+    </div>
+    
+    <div class="container">
+        <header class="border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <div class="fs-2 mb-3">
+                    <img src="{% static 'flag.svg' %}" alt="French learning simulator" width="32" height="32"/>
+                    <span style="color: #2f0000;">French learning simulator</span>
+                </div>
+            </a>
+        </header>
+        
+        <div class="p-5 mb-4 rounded-3" id="title-box">
+            <div class="container-fluid py-5">
+                <h1 class="display-1 fw-bold">French simulator and training cards for better learning</h1>
+                <p class="col-md-8 fs-4">Welcome to the french learning with fun <br/>
+                Here you can learn your favorite words by the categories</p>
             </div>
         </div>
-        <div class="col d-flex">
-            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                <svg class="bi" width="1em" height="1em">
-                    <use xlink:href="#cpu-fill"></use>
-                </svg>
-            </div>
-            <div>
-                <h3 class="fs-2">Add your own words</h3>
-                <p>Add new words and learn it easy</p>
-                <a href="/add-term" class="btn btn-primary">
-                    Add a new word
-                </a>
+        
+        <div class="-section">
+            <div class="container">
+                <!-- Нижняя подчеркнутая часть в цвете булгари -->
+                <h2 class="pb-2 border-bottom burgundy">Let's start learning</h2>
+                <div class="row g-4 py-5 row-cols-1 row-cols-lg-4">
+                    <div class="col d-flex">
+                        <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                            <svg class="bi" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/>
+                            </svg>
+                        </div>
+                        <div class="d-flex flex-column h-100 w-100">
+                            <div>
+                                <h3 class="fs-2">Vocabulary</h3>
+                                <p>Here you can find the list of the words with translation and sentences</p>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="/term-list" class="btn btn-primary">Take a look</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col d-flex">
+                        <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                            <svg class="bi" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                            </svg>
+                        </div>
+                        <div class="d-flex flex-column h-100 w-100">
+                            <div>
+                                <h3 class="fs-2">Add your own words</h3>
+                                <p>Add new words and learn it easy</p>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="/add-term" class="btn btn-primary">Add a new word</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col d-flex">
+                        <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                            <svg class="bi" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 1a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/>
+                                <path d="M4.5 7.5a.5.5 0 0 1 .5.5v1a3 3 0 0 0 6 0v-1a.5.5 0 0 1 1 0v1a4 4 0 0 1-8 0v-1a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                        </div>
+                        <div class="d-flex flex-column h-100 w-100">
+                            <div>
+                                <h3 class="fs-2">Learn new words</h3>
+                                <p>Can you remember all this word? <br>
+                                Let's check</p>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="/flip-card-game" class="btn btn-primary">Learn</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col d-flex">
+                        <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                            <svg class="bi" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                                <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0z"/>
+                            </svg>
+                        </div>
+                        <div class="d-flex flex-column h-100 w-100">
+                            <div>
+                                <h3 class="fs-2">Play and check your knowledge</h3>
+                                <p>With our game learning french became easier)</p>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="/french-game" class="btn btn-primary">Play</a>
+                            </div>
+                        </div>
+                    </div>
+                    
             </div>
         </div>
-        <div class="col d-flex">
-            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                <svg class="bi" width="1em" height="1em">
-                    <use xlink:href="#cpu-fill"></use>
-                </svg>
-            </div>
-            <div>
-                <h3 class="fs-2">Learn new words</h3>
-                <p>Can you remember all this word? <br>
-                Let's check</p>
-                <a href="/learn-words" class="btn btn-primary">
-                    Learn
-                </a>
+        
+        <!-- Отдельный блок Useful resources с фоном булгари -->
+        <div class="resources-section">
+            <div class="container">
+                <h2 class="pb-2 border-bottom">Useful resources</h2>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <p>You can also be interested in grammar or vocabulary. Also, you can learn a bit about french culture:</p>
+                        <ul class="resources-list">
+                            <li>
+                                <a href="https://tandem.net/blog/french-grammar-rules">
+                                    <span class="resources-icon"></span> Grammar rules
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.wordreference.com/enfr/">
+                                    <span class="resources-icon"></span> French dictionary
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.frenchtoday.com/blog/french-story/">
+                                    <span class="resources-icon"></span> Some french stories to read
+                                </a>
+                            </li>
+                        </ul>
+                        <p class="mt-3" style="font-size: 0.95rem; opacity: 0.9;">Start your French learning journey today with these carefully selected resources!</p>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col d-flex">
-            <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                <svg class="bi" width="1em" height="1em">
-                    <use xlink:href="#cpu-fill"></use>
-                </svg>
-            </div>
-            <div>
-                <h3 class="fs-2">Play and check your knowledges</h3>
-                <p> WIth our game learnong french became easier) </p>
-                <a href="/check-term" class="btn btn-primary">
-                    Play
-                </a>
+        
+        <!-- Новый раздел "How it works" в светлом цвете -->
+        <div class="how-it-works-section">
+            <div class="container">
+                <h2>How to use the site</h2>
+                <div class="steps-container">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Add your words</h3>
+                        <p>Add words that you want to learn in to the table.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Study the material</h3>
+                        <p>Go to the card mode and learn you words effectively</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Practice and repeat</h3>
+                        <p>Play match game or simply translate to better remember.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h3>Look at your words</h3>
+                        <p>Go to the vocabulary and take a look at whole list.</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e6d5b8;">
+                    <p style="font-size: 1rem;"><strong>Tip:</strong> Regular short sessions are more effective than long irregular ones. Practice for 15-20 minutes daily!</p>
+                </div>
             </div>
         </div>
     </div>
     
-    
-    <h2 class="pb-2 border-bottom">Что можете сделать вы?</h2>
-    <div class="row g-4 py-5 row-cols-1 row-cols-lg-2">
-        <div class="col-lg-4">
-            <h4 class="py-1">Useful resources</h4>
-        </div>
-        <div class="col-lg-8">
-            <p>Этот проект использует <a href="https://getbootstrap.com">Bootstrap</a>. Попробуйте другие дизайн-системы, например:
-                <ul>
-                    <li><a href="https://materializecss.com">Materialize</a></li>
-                    <li><a href="https://semantic-ui.com">Semantic UI</a></li>
-                    <li><a href="https://get.foundation/templates.html">Foundation</a></li>
-                </ul>
-            </p>
+    <!-- Нижняя часть страницы в цвете булгари -->
+    <div class="bottom-burgundy-bar">
+    <div class="container">
+            <p>© Bryukvina Darja, 2026</p>
         </div>
     </div>
-</div>
-{% endblock %}
-
-
-
-
-
+</main>
+</body>
+</html>
