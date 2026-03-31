@@ -1,49 +1,487 @@
-{% extends "base_page.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Term - French-English Dictionary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block page-title %}
-Добавить термин
-{% endblock %}
+        body {
+            font-family: 'Georgia', 'Times New Roman', 'Palatino', 'Book Antiqua', fantasy;
+            background: linear-gradient(135deg, #d4b48c 0%, #8b5a2b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-{% block page-lead %}
-Когда вы нажмёте на кнопку &laquo;Отправить&raquo;, веб-приложению отправится POST-запрос.
-При этом в полях <span class="fst-italic">Имя</span> и <span class="fst-italic">Email</span> есть атрибут
-<code>value required</code>, который подсказывает пользователю о необходимости заполнения — это свойство Bootstrap.
-{% endblock %}
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
+        /* Navigation Bar Styles */
+        .nav-bar {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            background: rgba(255, 245, 230, 0.95);
+            border-radius: 20px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #d4b48c;
+            backdrop-filter: blur(5px);
+        }
 
-{% block content %}
-<div class="container-sm px-5 py-5" id="term-form">
-    <form method="post">
-        <div class="row px-5 py-2">
-            <h3>Ваши контактные данные</h3>
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #8b5a2b;
+            font-family: 'Georgia', 'Times New Roman', 'Palatino', 'Book Antiqua', fantasy;
+        }
+
+        .nav-link:hover {
+            background: #fff5e6;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #e8d4b4, #d4b48c);
+            color: #5a3e2b;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fffaf0;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #e8d4b4 0%, #d4b48c 100%);
+            color: #5a3e2b;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid #c4a27a;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-family: 'Georgia', 'Times New Roman', 'Palatino', 'Book Antiqua', fantasy;
+        }
+
+        .form-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-wrapper {
+            padding: 30px;
+        }
+
+        .term-form {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .form-section {
+            background: #fff5e6;
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid #e8d4b4;
+        }
+
+        .form-section h2 {
+            color: #8b5a2b;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-left: 4px solid #d4b48c;
+            padding-left: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-field {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-field.full-width {
+            flex: 100%;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #5a3e2b;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d4b48c;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #c4a27a;
+            box-shadow: 0 0 0 3px rgba(196, 162, 122, 0.2);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .field-note {
+            display: block;
+            font-size: 0.8rem;
+            color: #9b6e42;
+            margin-top: 5px;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #9b6e42;
+            margin-top: 5px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #e8d4b4 0%, #d4b48c 100%);
+            color: #5a3e2b;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #d4b48c 0%, #c4a27a 100%);
+        }
+
+        .btn-cancel {
+            background: white;
+            color: #8b5a2b;
+            border: 2px solid #d4b48c;
+            padding: 10px 28px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel:hover {
+            background: #fff5e6;
+            transform: translateY(-2px);
+        }
+
+        .form-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            background: #8b5a2b;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .form-message.error {
+            background: #b86f3c;
+        }
+
+        .form-message.info {
+            background: #9b6e42;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .form-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-wrapper {
+                padding: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-submit, .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-bar {
+                margin: 0 auto 15px auto;
+                padding: 10px 15px;
+            }
+
+            .nav-link {
+                padding: 6px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/flip-card-game" class="nav-link">Flip Cards</a>
+            <a href="/french-game" class="nav-link">Learning Game</a>
+            <a href="/add-term" class="nav-link active">Add Term</a>
         </div>
-        <div class="row px-5 py-2">
-            <div class="col-md-6">
-                <label for="name">Ваше имя:</label>
-                <input type="text" class="form-control input-lg" name="name" id="name" placeholder="Иван" value required>
+
+        <div class="container">
+            <div class="form-header">
+                <h1>📝 Add New French-English Term</h1>
+                <p>Help expand the vocabulary database!</p>
             </div>
-            <div class="col-md-6">
-                <label for="email">Ваш контактный email:</label>
-                <input type="text" class="form-control input-lg" name="email" id="email" placeholder="ivan@ivanov.com" value required>
+
+            <div class="form-wrapper">
+                <form method="post" class="term-form" action="/send-term">
+                    <div class="form-section">
+                        <h2>👤 Your Information</h2>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="name">Your Name:</label>
+                                <input type="text" class="form-control" name="name" id="name" placeholder="Enter your name" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="email">Your Email:</label>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="your@email.com" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>📖 Term Details</h2>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="new_term">French Term 🇫🇷:</label>
+                                <input type="text" class="form-control" name="new_term" id="new_term" placeholder="Enter the French word or phrase">
+                                <small class="field-note">Example: Bonjour, Merci, Au revoir</small>
+                            </div>
+                            <div class="form-field full-width">
+                                <label for="new_definition">English Definition 🇬🇧:</label>
+                                <textarea class="form-control" name="new_definition" id="new_definition" rows="4" placeholder="Enter the English translation or explanation"></textarea>
+                                <small class="field-note">Try to keep it concise - one or two sentences maximum</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <span>➕</span>
+                            Add Term
+                        </button>
+                        <a href="/" class="btn-cancel">
+                            <span>🏠</span>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="row px-5 py-2">
-            <h3>Ваш термин</h3>
-        </div>
-        <div class="row px-5 py-2">
-            <div class="col-md-4">
-                <label for="new_term">Термин</label>
-                <input type="text" class="form-control input-lg" name="new_term" id="new_term">
-            </div>
-            <div class="col-md-8">
-                <label for="new_definition">Объяснение термина</label>
-                <textarea type="text" class="form-control input-lg" name="new_definition" id="new_definition" aria-describedby="definition_note" rows="3"></textarea>
-                <div id="definition_note" class="form-text">Постарайтесь уложиться в одно, максимум два предложения</div>
-            </div>
-        </div>
-        <div class="row px-5 py-2">
-            <button type="submit" class="btn btn-primary" formaction="/send-term">Отправить</button>
-        </div>
-    </form>
-</div>
-{% endblock %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.term-form');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const termInput = document.getElementById('new_term');
+            const definitionInput = document.getElementById('new_definition');
+            
+            if (definitionInput) {
+                const charCounter = document.createElement('div');
+                charCounter.className = 'char-counter';
+                definitionInput.parentNode.appendChild(charCounter);
+                
+                function updateCharCount() {
+                    const length = definitionInput.value.length;
+                    charCounter.textContent = `${length} characters`;
+                    if (length > 200) {
+                        charCounter.style.color = '#b86f3c';
+                    } else {
+                        charCounter.style.color = '#9b6e42';
+                    }
+                }
+                
+                definitionInput.addEventListener('input', updateCharCount);
+                updateCharCount();
+            }
+            
+            if (emailInput) {
+                emailInput.addEventListener('input', function() {
+                    const email = this.value;
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (email && !emailPattern.test(email)) {
+                        this.style.borderColor = '#b86f3c';
+                    } else {
+                        this.style.borderColor = '#d4b48c';
+                    }
+                });
+            }
+            
+            if (termInput) {
+                termInput.addEventListener('input', function() {
+                    if (this.value.length > 50) {
+                        this.style.borderColor = '#b86f3c';
+                    } else {
+                        this.style.borderColor = '#d4b48c';
+                    }
+                });
+            }
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!nameInput.value.trim()) {
+                        e.preventDefault();
+                        showTemporaryMessage('Please enter your name', 'error');
+                        nameInput.focus();
+                        return false;
+                    }
+                    
+                    if (!emailInput.value.trim()) {
+                        e.preventDefault();
+                        showTemporaryMessage('Please enter your email', 'error');
+                        emailInput.focus();
+                        return false;
+                    }
+                    
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(emailInput.value)) {
+                        e.preventDefault();
+                        showTemporaryMessage('Please enter a valid email address', 'error');
+                        emailInput.focus();
+                        return false;
+                    }
+                    
+                    if (!termInput.value.trim()) {
+                        e.preventDefault();
+                        showTemporaryMessage('Please enter the French term', 'error');
+                        termInput.focus();
+                        return false;
+                    }
+                    
+                    if (!definitionInput.value.trim()) {
+                        e.preventDefault();
+                        showTemporaryMessage('Please enter the English definition', 'error');
+                        definitionInput.focus();
+                        return false;
+                    }
+                    
+                    showTemporaryMessage('Adding your term...', 'info');
+                    return true;
+                });
+            }
+            
+            function showTemporaryMessage(message, type) {
+                const existingMessage = document.querySelector('.form-message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `form-message ${type}`;
+                messageDiv.textContent = message;
+                document.body.appendChild(messageDiv);
+                
+                setTimeout(() => {
+                    messageDiv.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        messageDiv.remove();
+                    }, 300);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
