@@ -320,14 +320,15 @@
 
         <div class="container">
             <div class="form-header">
-                <h1>📝 Add New French-English Term</h1>
+                <h1>Add New French-English Term</h1>
                 <p>Help expand the vocabulary database!</p>
             </div>
 
             <div class="form-wrapper">
-                <form method="post" class="term-form" action="/send-term">
+                <form method="post" class="term-form" action="/request-term">
+                  {% csrf_token %}
                     <div class="form-section">
-                        <h2>👤 Your Information</h2>
+                        <h2>Your Information</h2>
                         <div class="form-row">
                             <div class="form-field">
                                 <label for="name">Your Name:</label>
@@ -341,7 +342,7 @@
                     </div>
 
                     <div class="form-section">
-                        <h2>📖 Term Details</h2>
+                        <h2>Term Details</h2>
                         <div class="form-row">
                             <div class="form-field">
                                 <label for="new_term">French Term 🇫🇷:</label>
@@ -358,11 +359,11 @@
 
                     <div class="form-actions">
                         <button type="submit" class="btn-submit">
-                            <span>➕</span>
+                            <span></span>
                             Add Term
                         </button>
                         <a href="/" class="btn-cancel">
-                            <span>🏠</span>
+                            <span></span>
                             Cancel
                         </a>
                     </div>
